@@ -1,0 +1,41 @@
+# ---- Scientific core
+numpy
+scipy
+pillow
+opencv-python
+
+# ---- GPU computing
+cupy-cuda12x
+
+# ---- C++ integration
+pybind11
+cmake
+
+# ---- Metrics & evaluation
+scikit-image
+
+# ---- Experiment tracking
+mlflow
+wandb
+
+# ---- Deployment
+fastapi
+uvicorn
+python-multipart
+
+# ---- Testing
+pytest
+pytest-benchmark
+
+# ---- Monitoring & profiling
+psutil
+pynvml
+line_profiler
+memory_profiler
+
+# ---- Utilities
+pyyaml
+hydra-core
+tqdm
+loguru
+rich
