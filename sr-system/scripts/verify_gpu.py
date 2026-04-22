@@ -28,7 +28,7 @@ def check_gpu():
 def benchmark():
     print("\n---- Running benchmark (10000x10000 matmul) ----")
 
-    size = 10000
+    size = 30000
 
     # ---- CPU
     a_cpu = np.random.rand(size, size).astype(np.float32)

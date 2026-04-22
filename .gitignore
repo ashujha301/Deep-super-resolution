@@ -24,11 +24,11 @@ venv/
 # =========================
 # DATA (VERY IMPORTANT)
 # =========================
-data/raw/
-data/processed/
-data/train/
-data/val/
-data/test/
+sr-system/data/raw/
+sr-system/data/processed/
+sr-system/data/train/
+sr-system/data/val/
+sr-system/data/test/
 
 # =========================
 # EXPERIMENTS
