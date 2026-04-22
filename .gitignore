@@ -25,6 +25,7 @@ venv/
 # DATA (VERY IMPORTANT)
 # =========================
 sr-system/data/raw/
+sr-system/data/samples
 sr-system/data/processed/
 sr-system/data/train/
 sr-system/data/val/
