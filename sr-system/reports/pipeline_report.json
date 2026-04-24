@@ -1,0 +1,76 @@
+{
+  "dataset": "div2k",
+  "run_timestamp_utc": "2026-04-24T12:58:58.032548+00:00",
+  "raw_dir": "data\\raw\\div2k",
+  "output_dir": "data\\processed",
+  "seed": 42,
+  "scale_factor": 2,
+  "validation": {
+    "total_images_found": 5,
+    "valid_images": 5,
+    "rejected_images": 0,
+    "rejection_reasons": {},
+    "valid_images_path": "data/processed/metadata/valid_images.json",
+    "rejected_images_path": "data/processed/metadata/rejected_images.json"
+  },
+  "downsampling": {
+    "degradation": "bicubic",
+    "scale": 2,
+    "lr_output_dir": "data\\processed\\lr\\bicubic",
+    "generated_count": 5,
+    "skipped_count": 0,
+    "failed_count": 0
+  },
+  "patching": {
+    "scale": 2,
+    "hr_patch_size": [
+      48,
+      48
+    ],
+    "lr_patch_size": [
+      24,
+      24
+    ],
+    "strategy": "grid",
+    "total_patches_extracted": 6552,
+    "average_patches_per_image": 1310.4,
+    "patch_index_path": "data/processed/metadata/patch_index.json",
+    "failed_count": 0
+  },
+  "loader": {
+    "available": true,
+    "backend": "numpy",
+    "batch_size": 8,
+    "estimated_batches_per_epoch": 819,
+    "hr_batch_shape": [
+      8,
+      3,
+      48,
+      48
+    ],
+    "lr_batch_shape": [
+      8,
+      3,
+      24,
+      24
+    ],
+    "hr_dtype": "float32",
+    "lr_dtype": "float32",
+    "normalization_range_observed": {
+      "hr": [
+        0.0,
+        0.9686274528503418
+      ],
+      "lr": [
+        0.0,
+        0.95686274766922
+      ]
+    }
+  },
+  "samples": {
+    "saved": true,
+    "sample_hr": "reports\\samples\\sample_hr.png",
+    "sample_lr": "reports\\samples\\sample_lr.png",
+    "sample_lr_upscaled_preview": "reports\\samples\\sample_lr_upscaled_preview.png"
+  }
+}

@@ -7,6 +7,10 @@ __pycache__/
 *.pyd
 *.so
 
+*.pytest_cache
+
+
+
 # =========================
 # BUILD / DIST
 # =========================
@@ -30,6 +34,7 @@ sr-system/data/processed/
 sr-system/data/train/
 sr-system/data/val/
 sr-system/data/test/
+*.png
 
 # =========================
 # EXPERIMENTS

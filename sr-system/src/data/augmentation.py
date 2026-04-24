@@ -1,39 +1,34 @@
+from __future__ import annotations
+from dataclasses import dataclass
 import numpy as np
 
+@dataclass(frozen=True)
+class AugmentationConfig:
+    enabled: bool = True
+    horizontal_flip_prob: float = 0.5
+    vertical_flip_prob: float = 0.5
+    rotate: bool = True
+    seed: int = 42
 
-class Augmentor:
-    def __init__(
-        self,
-        hflip=True,
-        vflip=True,
-        rotation=True,
-        color_jitter=False
-    ):
-        self.hflip = hflip
-        self.vflip = vflip
-        self.rotation = rotation
-        self.color_jitter = color_jitter
+class PairedAugmenter:
+    def __init__(self, config: AugmentationConfig):
+        self.config = config
+        self.rng = np.random.default_rng(config.seed)
 
-    def augment(self, hr, lr):
-        # ---- Single random state
-        if self.hflip and np.random.rand() > 0.5:
-            hr = hr[:, ::-1, :]
-            lr = lr[:, ::-1, :]
+    def __call__(self, hr: np.ndarray, lr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        if not self.config.enabled:
+            return hr, lr
+        do_h = self.rng.random() < self.config.horizontal_flip_prob
+        do_v = self.rng.random() < self.config.vertical_flip_prob
+        k = int(self.rng.integers(0, 4)) if self.config.rotate else 0
+        return self.apply_with_params(hr, lr, do_h=do_h, do_v=do_v, rot_k=k)
 
-        if self.vflip and np.random.rand() > 0.5:
-            hr = hr[::-1, :, :]
-            lr = lr[::-1, :, :]
-
-        if self.rotation:
-            k = np.random.randint(0, 4)
-            hr = np.rot90(hr, k, axes=(0, 1))
-            lr = np.rot90(lr, k, axes=(0, 1))
-
-        # ---- Color jitter (optional, HR only)
-        if self.color_jitter:
-            brightness = np.random.uniform(-20, 20)
-            contrast = np.random.uniform(0.8, 1.2)
-
-            hr = np.clip(hr * contrast + brightness, 0, 255)
-
-        return hr, lr
+    @staticmethod
+    def apply_with_params(hr: np.ndarray, lr: np.ndarray, *, do_h: bool = False, do_v: bool = False, rot_k: int = 0) -> tuple[np.ndarray, np.ndarray]:
+        if do_h:
+            hr = np.flip(hr, axis=1); lr = np.flip(lr, axis=1)
+        if do_v:
+            hr = np.flip(hr, axis=0); lr = np.flip(lr, axis=0)
+        if rot_k:
+            hr = np.rot90(hr, k=rot_k, axes=(0, 1)); lr = np.rot90(lr, k=rot_k, axes=(0, 1))
+        return np.ascontiguousarray(hr), np.ascontiguousarray(lr)

@@ -1,101 +1,104 @@
-import os
+from __future__ import annotations
+from dataclasses import dataclass, asdict
+from pathlib import Path
+from typing import Iterable, Literal
 import json
 from PIL import Image, UnidentifiedImageError
-import numpy as np
-from pathlib import Path
-from tqdm import tqdm
 
+SplitName = Literal["train", "valid", "test", "unknown"]
+
+@dataclass(frozen=True)
+class ValidationConfig:
+    raw_dir: Path
+    output_metadata_dir: Path
+    min_width: int = 96
+    min_height: int = 96
+    supported_extensions: tuple[str, ...] = (".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff")
+    train_subdir: str = "train_hr"
+    valid_subdir: str = "valid_hr"
+    allow_unknown_layout: bool = True
+
+@dataclass(frozen=True)
+class ValidImageRecord:
+    path: str
+    split: SplitName
+    width: int
+    height: int
+    mode: str
+    filename: str
+
+@dataclass(frozen=True)
+class RejectedImageRecord:
+    path: str
+    split: SplitName
+    reason: str
+    details: str
 
 class DatasetValidator:
-    def __init__(self, data_dir, patch_size=48, scale=2):
-        self.data_dir = Path(data_dir)
-        self.patch_size = patch_size
-        self.scale = scale
+    def __init__(self, config: ValidationConfig):
+        self.config = config
+        self.config.output_metadata_dir.mkdir(parents=True, exist_ok=True)
 
-        self.min_size = patch_size * scale * 4  # important rule
+    def discover_images(self) -> list[tuple[Path, SplitName]]:
+        raw_dir = Path(self.config.raw_dir)
+        candidates: list[tuple[Path, SplitName]] = []
+        split_dirs = [(raw_dir / self.config.train_subdir, "train"), (raw_dir / self.config.valid_subdir, "valid")]
+        found_known_layout = False
+        for split_dir, split in split_dirs:
+            if split_dir.exists():
+                found_known_layout = True
+                candidates.extend((p, split) for p in self._walk_files(split_dir))
+        if not found_known_layout and self.config.allow_unknown_layout:
+            candidates.extend((p, "unknown") for p in self._walk_files(raw_dir))
+        return sorted(candidates, key=lambda item: str(item[0]))
 
-        self.valid_files = []
-        self.invalid_files = []
-        self.rejected_files = []
-        self.converted_files = []
-
-    # ---- Validate dataset
-    def validate(self):
-        files = list(self.data_dir.glob("*.png"))
-
-        for file in tqdm(files, desc="Validating images"):
-            try:
-                img = Image.open(file)
-
-                # ---- Channel handling
-                if img.mode == "L":
-                    img = img.convert("RGB")
-                    self.converted_files.append(str(file))
-
-                elif img.mode == "RGBA":
-                    img = img.convert("RGB")
-                    self.converted_files.append(str(file))
-
-                elif img.mode != "RGB":
-                    self.invalid_files.append(str(file))
-                    continue
-
-                w, h = img.size
-
-                # ---- Resolution check
-                if w < self.min_size or h < self.min_size:
-                    self.rejected_files.append(str(file))
-                    continue
-
-                self.valid_files.append(str(file))
-
-            except UnidentifiedImageError:
-                self.invalid_files.append(str(file))
-
-        return self._generate_report()
-
-    # ---- Compute stats (sample 100 images)
-    def compute_stats(self, sample_size=20):
-        import random
-
-        sample_files = random.sample(self.valid_files, min(sample_size, len(self.valid_files)))
-
-        pixels = []
-
-        for file in sample_files:
-            img = Image.open(file).resize((256, 256))  # downscale for speed
-            img = np.array(img).astype(np.float32)
-            pixels.append(img.reshape(-1, 3))
-
-        pixels = np.concatenate(pixels, axis=0)
-
-        stats = {
-            "mean": pixels.mean(axis=0).tolist(),
-            "std": pixels.std(axis=0).tolist(),
+    def validate(self, max_images: int | None = None) -> dict:
+        valid: list[ValidImageRecord] = []
+        rejected: list[RejectedImageRecord] = []
+        discovered = self.discover_images()
+        if max_images is not None:
+            discovered = discovered[:max_images]
+        for path, split in discovered:
+            result = self._validate_one(path, split)
+            if isinstance(result, ValidImageRecord):
+                valid.append(result)
+            else:
+                rejected.append(result)
+        summary = {
+            "total_images_found": len(discovered),
+            "valid_images": len(valid),
+            "rejected_images": len(rejected),
+            "valid_records": [asdict(x) for x in valid],
+            "rejected_records": [asdict(x) for x in rejected],
         }
+        self._write_outputs(summary)
+        return summary
 
-        return stats
+    def _validate_one(self, path: Path, split: SplitName) -> ValidImageRecord | RejectedImageRecord:
+        if path.suffix.lower() not in self.config.supported_extensions:
+            return RejectedImageRecord(str(path), split, "unsupported_extension", path.suffix)
+        try:
+            with Image.open(path) as img:
+                img.verify()
+            with Image.open(path) as img:
+                width, height = img.size
+                mode = img.mode
+        except UnidentifiedImageError as exc:
+            return RejectedImageRecord(str(path), split, "cannot_open", str(exc))
+        except OSError as exc:
+            return RejectedImageRecord(str(path), split, "corrupted_file", str(exc))
+        if mode != "RGB":
+            return RejectedImageRecord(str(path), split, "not_rgb", f"mode={mode}")
+        if width < self.config.min_width or height < self.config.min_height:
+            return RejectedImageRecord(str(path), split, "too_small", f"{width}x{height}")
+        return ValidImageRecord(str(path), split, width, height, mode, path.name)
 
-    # ---- Generate report
-    def _generate_report(self):
-        report = {
-            "valid_count": len(self.valid_files),
-            "invalid_count": len(self.invalid_files),
-            "rejected_count": len(self.rejected_files),
-            "converted_count": len(self.converted_files),
-        }
+    def _walk_files(self, directory: Path) -> Iterable[Path]:
+        if not directory.exists():
+            return []
+        return (p for p in directory.rglob("*") if p.is_file())
 
-        return report
-
-    # ---- Save report
-    def save_report(self, output_path):
-        report = self._generate_report()
-
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-
-        with open(output_path, "w") as f:
-            json.dump(report, f, indent=4)
-
-        print("\n---- Validation Summary ----")
-        for k, v in report.items():
-            print(f"{k}: {v}")
+    def _write_outputs(self, summary: dict) -> None:
+        metadata_dir = self.config.output_metadata_dir
+        (metadata_dir / "valid_images.json").write_text(json.dumps(summary["valid_records"], indent=2), encoding="utf-8")
+        (metadata_dir / "rejected_images.json").write_text(json.dumps(summary["rejected_records"], indent=2), encoding="utf-8")
