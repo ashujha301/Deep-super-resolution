@@ -6,10 +6,13 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
-
 *.pytest_cache
 
-
+#======================
+# Model weights 
+# =====================
+*.pth
+*.pt
 
 # =========================
 # BUILD / DIST
@@ -28,12 +31,12 @@ venv/
 # =========================
 # DATA (VERY IMPORTANT)
 # =========================
-sr-system/data/raw/
-sr-system/data/samples
-sr-system/data/processed/
-sr-system/data/train/
-sr-system/data/val/
-sr-system/data/test/
+isr-system/data/raw/
+isr-system/data/samples
+isr-system/data/processed/
+isr-system/data/train/
+isr-system/data/val/
+isr-system/data/test/
 *.png
 
 # =========================
