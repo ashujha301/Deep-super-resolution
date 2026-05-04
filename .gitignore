@@ -7,6 +7,9 @@ venv/
 storage/raw/
 storage/processed/
 
+secrets/
+*.json
+
 mlruns/
 wandb/
 .dvc/cache/

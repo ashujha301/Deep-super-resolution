@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_env: str
 
     # Storage
+    gcp_project_id: str
     gcs_bucket: str
 
     # Kafka
@@ -18,6 +19,9 @@ class Settings(BaseSettings):
 
     # Monitoring
     prometheus_port: int
+
+    #database
+    database_url: str
 
     class Config:
         env_file = ".env"

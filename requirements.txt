@@ -65,3 +65,17 @@ tqdm
 loguru
 rich
 huggingface-hub
+
+# --- GCP Storage ---
+google-cloud-storage
+
+# --- Database ---
+sqlalchemy
+alembic
+psycopg2-binary
+
+# --- Kafka ---
+confluent-kafka
+
+# --- IDs / Utils ---
+python-magic
