@@ -1,41 +1,67 @@
-# ---- Scientific core
+# --- Core / ML ---
+torch
+torchvision
 numpy
+torchmetrics
 scipy
-pillow
-opencv-python
 
-# ---- GPU computing
+# --- Image & Data Processing ---
+opencv-python
+Pillow
+albumentations
+scikit-image
+
+# --- Metrics ---
+piq
+
+# --- GPU / Acceleration ---
+onnx
+onnxruntime-gpu
 cupy-cuda12x
 
-# ---- C++ integration
+# --- C++ / Performance ---
 pybind11
 cmake
 
-# ---- Metrics & evaluation
-scikit-image
-
-# ---- Experiment tracking
+# --- Experiment Tracking ---
 mlflow
 wandb
 
-# ---- Deployment
+# --- Data Versioning ---
+dvc
+
+# --- Config / Utils ---
+pydantic
+pydantic-settings
+pyyaml
+python-dotenv
+hydra-core
+
+# --- API / Backend ---
 fastapi
 uvicorn
 python-multipart
 
-# ---- Testing
-pytest
-pytest-benchmark
-
-# ---- Monitoring & profiling
+# --- Monitoring / Profiling ---
+prometheus-client
 psutil
 pynvml
 line_profiler
 memory_profiler
 
-# ---- Utilities
-pyyaml
-hydra-core
+# --- Testing ---
+pytest
+pytest-benchmark
+pytest-cov
+
+# --- Dev / Code Quality ---
+black
+isort
+flake8
+mypy
+
+# --- General Utilities ---
 tqdm
 loguru
 rich
+huggingface-hub
