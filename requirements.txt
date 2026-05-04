@@ -5,6 +5,15 @@ numpy
 torchmetrics
 scipy
 
+# --- Real ESRGAN Model needs ---
+# realesrgan
+# basicsr
+# gfpgan
+# facexlib
+
+# --- AI Forever Real-ESRGAN ---
+git+https://github.com/ai-forever/Real-ESRGAN.git
+
 # --- Image & Data Processing ---
 opencv-python
 Pillow
@@ -18,6 +27,7 @@ piq
 onnx
 onnxruntime-gpu
 cupy-cuda12x
+nvidia-ml-py
 
 # --- C++ / Performance ---
 pybind11
@@ -45,7 +55,6 @@ python-multipart
 # --- Monitoring / Profiling ---
 prometheus-client
 psutil
-pynvml
 line_profiler
 memory_profiler
 
@@ -64,7 +73,7 @@ mypy
 tqdm
 loguru
 rich
-huggingface-hub
+huggingface-hub==0.25.2
 
 # --- GCP Storage ---
 google-cloud-storage
