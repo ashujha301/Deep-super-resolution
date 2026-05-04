@@ -1,0 +1,15 @@
+app:
+  name: media-optimizer
+  version: 1.0
+
+image:
+  max_upload: 10
+  allowed_formats: ["jpeg", "jpg", "png"]
+
+processing:
+  default_upscale: 2
+  supported_upscale: [2, 4]
+
+optimization:
+  formats: ["webp", "jpeg", "png"]
+  quality_range: [60, 95]

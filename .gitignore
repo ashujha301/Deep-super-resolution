@@ -1,60 +1,23 @@
-# =========================
-# PYTHON
-# =========================
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.so
-*.pytest_cache
-
-#======================
-# Model weights 
-# =====================
-*.pth
-*.pt
-
-# =========================
-# BUILD / DIST
-# =========================
-build/
-dist/
-*.egg-info/
-
-# =========================
-# VIRTUAL ENV
-# =========================
-env/
+.env
 venv/
 .venv/
 
-# =========================
-# DATA (VERY IMPORTANT)
-# =========================
-isr-system/data/raw/
-isr-system/data/samples
-isr-system/data/processed/
-isr-system/data/train/
-isr-system/data/val/
-isr-system/data/test/
-*.png
+storage/raw/
+storage/processed/
 
-# =========================
-# EXPERIMENTS
-# =========================
-experiments/mlruns/
+mlruns/
 wandb/
-logs/
+.dvc/cache/
 
-# =========================
-# NOTEBOOK CHECKPOINTS
-# =========================
-.ipynb_checkpoints/
+*.onnx
+*.pt
+*.pth
 
-# =========================
-# ENV FILES
-# =========================
-.env
+.pytest_cache/
+.mypy_cache/
+.coverage
 
 # =========================
 # C++ BUILD
