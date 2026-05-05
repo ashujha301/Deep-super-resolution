@@ -50,6 +50,7 @@ class RealESRGANService:
         model.load_weights(str(weight_path), download=False)
 
         # Force eval + no grad globally
+        model.model.float()
         model.model.eval()
 
         self.models[scale] = model
